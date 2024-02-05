@@ -1,28 +1,54 @@
 
 
 
-cartogramMap <- function(districts, var, title, low = "gray92", high) {
-  districts <- subset(districts, PARTIDO == var)
-  ggplot(districts, aes(map_id = id)) + 
-    geom_map(aes(fill = per), map=cartogram, color="gray30", size = .1) +
-    geom_polygon(data = state_cartogram, aes(long,lat, group=group),
-                 color = "black", size = .25, fill = "transparent") +
-    expand_limits(x = cartogram$long, y = cartogram$lat) +
-    coord_map()+
+# cartogramMap <- function(districts, var, title, low = "gray92", high) {
+#   districts <- subset(districts, PARTIDO == var)
+#   ggplot(districts, aes(map_id = id)) + 
+#     geom_map(aes(fill = per), map=cartogram, color="gray30", size = .1) +
+#     geom_polygon(data = state_cartogram, aes(long,lat, group=group),
+#                  color = "black", size = .25, fill = "transparent") +
+#     expand_limits(x = cartogram$long, y = cartogram$lat) +
+#     coord_map()+
+#     theme_bw() +
+#     ggtitle(title) +
+#     scale_fill_gradient("percent", low = "gray92", high = high, labels = percent) +
+#     theme(panel.border=element_blank()) +
+#     theme(panel.grid=element_blank()) +
+#     theme(axis.ticks=element_blank()) +
+#     theme(axis.text=element_blank()) + 
+#     labs(x=NULL, y=NULL)
+#   #ggsave(str_c("graphs/", title, ".png"), width = 9, height = 7, dpi = 100)
+# }
+
+cartogramMap <- function(districts_sf, var, title, low = "gray92", high) {
+  districts <- subset(districts_sf, PARTIDO == var)
+  ggplot() + 
+    geom_sf(data = districts_sf, aes(fill = per), color="gray30", size = .1) +
+    geom_sf(data = state_cartogram, color = "black", size = .25, fill = NA) +
     theme_bw() +
     ggtitle(title) +
-    scale_fill_gradient("percent", low = "gray92", high = high, labels = percent) +
-    theme(panel.border=element_blank()) +
-    theme(panel.grid=element_blank()) +
-    theme(axis.ticks=element_blank()) +
-    theme(axis.text=element_blank()) + 
-    labs(x=NULL, y=NULL)
-  #ggsave(str_c("graphs/", title, ".png"), width = 9, height = 7, dpi = 100)
+    scale_fill_gradient("percent", low = "gray92", high = high, labels = scales::percent) +
+    theme(
+      panel.border = element_blank(),
+      panel.grid = element_blank(),
+      axis.ticks = element_blank(),
+      axis.text = element_blank()
+    ) + 
+    labs(x = NULL, y = NULL)
 }
+
+# Example usage:
+cartogramMap(districts_sf, "PRI_T", high = "#ec242a", 
+             title = "PRI votes equal area cartogram, by district")
+ggsave(filename = "/Users/martin/Dev/PRI-cartograma.png", plot = last_plot(), width = 9, height = 7, dpi = 100)
+
+
 
 cartogramMap(districts, "PRI_T", high = "#ec242a", 
              title = "PRI votes equal area cartogram, by district") %>%
-  savePlot("PRI-cartograma")
+  #savePlot("PRI-cartograma.png")
+  ggsave(filename = "/Users/martin/Dev/PRI-cartograma.png", plot = last_plot(), width = 9, height = 7, dpi = 100)
+
 cartogramMap(districts, "PVEM_T", high = "#2ca25f", 
              title = "PVEM votes equal area cartogram, by district")%>%
   savePlot("PVEM-cartograma")
@@ -63,3 +89,4 @@ cartogramMap(districts,  "C_PRD_PT_T", high = "#fec44f",
 cartogramMap(districts,  "CAND_IND_1", high = "#4d4d4d", 
              title = "Independent candidate votes equal area cartogram, by district")%>%
   savePlot("INDEP1-cartograma")
+
